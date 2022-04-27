@@ -37,6 +37,8 @@ app =  Flask(__name__)
 # conn.execute('INSERT INTO phonebook (phone_no,name,addr,social_media)\
 #     VALUES ("4152780111", "Andy", "3221 drew cres.", "@andy")')
 # conn.commit()
+
+
 response = requests.get('https://api.coindesk.com/v1/bpi/currentprice.json') #get request
 data = response.json()
 btccost = data["bpi"]["USD"]["rate"]
@@ -137,30 +139,6 @@ def postregister():
             return render_template("result.html",msg = msg)
             con.close()
     
-@app.route('/postphone', methods = ['POST', 'GET'])
-def postphone():
-    if request.method == 'POST':
-        try:
-            phone_no = request.form['phone_no']
-            name = request.form['name']
-            addr = request.form['addr']
-            social_media = request.form['social_media']
-
-            with sql.connect("database.db") as con:
-                cur = con.cursor()
-
-            cur.execute("INSERT INTO phonebook (phone_no,name,addr,social_media)\
-               VALUES (?,?,?,?)",(phone_no,name,addr,social_media) )
-
-            con.commit()
-            msg = "records added"
-        except:
-            con.rollback()
-            msg = "An error has occured"
-        
-        finally:
-            return render_template("result.html",msg = msg)
-            con.close()
 
 @app.route('/newwallet')
 def newwallet():
@@ -191,6 +169,36 @@ def createwallet():
             return render_template("result.html",msg = msg)
             con.close()
 
+@app.route('/purchase', methods = ['POST', 'GET'])
+def purchase():
+    if request.method == 'POST':
+        try:
+            userform = request.form['username']
+            passform = request.form['password']
+            item = request.form['iid']
+            gid = request.form['gid']
+            print(gid,item, file=sys.stderr)
+
+            with sql.connect("database.db") as con:
+                cur = con.cursor()
+            balance=0
+            cur.execute("select uid from users where username=? AND password=?", (userform,passform))
+            row = cur.fetchone()
+            uid = row[0] + 1
+            
+            cur.execute("INSERT INTO items (name,uid,gid) VALUES (?,?,?)",(item,uid,gid) )
+            msg = "item purchased"
+            con.commit()
+        except:
+            con.rollback()
+            msg = "An error has occured, Please check user/pass and try again"
+        
+        finally:
+            return render_template("result.html",msg = msg)
+            con.close()
+
+
+
 @app.route('/register')
 def register():
     return render_template("register.html")
@@ -211,6 +219,41 @@ def balance():
 
     return render_template("balance.html", rows = rows, uid = uid)
     con.close()
+
+@app.route('/inventory')
+def inventory():
+    con = sql.connect("database.db")
+    con.row_factory = sql.Row
+
+    uid = request.args.get('uid')
+    print(uid, file=sys.stderr)
+    cur = con.cursor()
+    
+    cur.execute('select * from items where uid=?', (uid,))
+    rows = cur.fetchall()
+    balance = cur.fetchone()
+
+    return render_template("inventory.html", rows = rows, uid = uid)
+    con.close()
+
+@app.route('/listbygame')
+def listbygame():
+    con = sql.connect("database.db")
+    con.row_factory = sql.Row
+
+    game = request.args.get('game')
+    cur = con.cursor()
+    
+    cur.execute('select * from listing where gid=?', (game,))
+    rows = cur.fetchall()
+    
+    cur.execute('select name from game where gid=?', (game,))
+    name = cur.fetchone()[0]
+
+    return render_template("gamelistings.html", rows = rows, game = game, name=name)
+    con.close()
+
+
 
 @app.route('/addfunds', methods = ['POST', 'GET'])
 def addfunds():
