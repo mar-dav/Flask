@@ -51,19 +51,19 @@ Check list for all files that you will use in yourcode:
 flask_main.py (All api calls are in this file)
   i. btccost & ethcost (requests.get method)
   ii. index.html (‘/’) calls btccost and ethcost
-  iii. login.html (‘/login’) post/get api call. Requestinglogin.html via get
-will return nologin.html which is a custom 404 page made.
+  iii. login.html (‘/login’) post/get api call. 
+  Requesting login.html via get will return nologin.html which is a custom 404 page made.
 Requesting login.html via post will call select statements for my sqlite
 database to validate the username and password. There's a conditional
 on dashboard.html
 
-iv. Dashboard (‘/dashboard’) Post/Get calls. If websiterequested by get
+iv. Dashboard (‘/dashboard’) Post/Get calls. If website requested by get
 then return nologin.html, but if not return dashboard.html
 
 v. Games (‘/games’). Connect to the sqlite database and store it in games
 and the sql table to games.html to be processed and displayed
 Games.html has a for loop which runs via the python interpreter
-vi. Newlist (‘/newlist’) page to create a new listingto post an item. Uses
+vi. Newlist (‘/newlist’) page to create a new listing to post an item. Uses
 the games table to generate radio buttons so the user can select which
 game he wants.
 
@@ -116,8 +116,8 @@ C. Database:
 
 ## Project Overview:
 
-This project simulates a crypto trading marketplace.Users can register, view listings by game,
-add simulated bitcoin or ethereum wallets and be ableto post listings for items in that game.
+This project simulates a crypto trading marketplace. Users can register, view listings by game,
+add simulated bitcoin or ethereum wallets and be able to post listings for items in that game.
 
 ## Standards:
 
